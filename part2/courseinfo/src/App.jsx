@@ -5,13 +5,20 @@ const Part = ({ name, exercises }) => (
     {name} {exercises}
   </p>
 );
-const Content = ({ courseParts }) => (
-  <>
-    {courseParts.map((part) => (
-      <Part key={part.id} name={part.name} exercises={part.exercises} />
-    ))}
-  </>
-);
+const Content = ({ courseParts }) => {
+  let totalExercises = 0;
+  return (
+    <>
+      {courseParts.map((part) => {
+        totalExercises += part.exercises;
+        return (
+          <Part key={part.id} name={part.name} exercises={part.exercises} />
+        );
+      })}
+      <strong>total of {totalExercises} exercises</strong>
+    </>
+  );
+};
 
 const Course = ({ course }) => (
   <>
@@ -38,6 +45,11 @@ const App = () => {
         name: "State of a component",
         exercises: 14,
         id: 3,
+      },
+      {
+        name: "Redux",
+        exercises: 11,
+        id: 4,
       },
     ],
   };
