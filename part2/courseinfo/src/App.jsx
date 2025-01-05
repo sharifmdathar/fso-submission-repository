@@ -5,25 +5,24 @@ const Part = ({ name, exercises }) => (
     {name} {exercises}
   </p>
 );
-const Content = ({ courseParts }) => {
-  let totalExercises = 0;
-  return (
-    <>
-      {courseParts.map((part) => {
-        totalExercises += part.exercises;
-        return (
-          <Part key={part.id} name={part.name} exercises={part.exercises} />
-        );
-      })}
-      <strong>total of {totalExercises} exercises</strong>
-    </>
-  );
+const Content = ({ courseParts }) => (
+  <>
+    {courseParts.map((part) => (
+      <Part key={part.id} name={part.name} exercises={part.exercises} />
+    ))}
+  </>
+);
+
+const Total = ({ courseParts }) => {
+  const total = courseParts.reduce((sum, part) => sum + part.exercises, 0);
+  return <strong>total of {total} exercises</strong>
 };
 
 const Course = ({ course }) => (
   <>
     <Header courseName={course.name} />
     <Content courseParts={course.parts} />
+    <Total courseParts={course.parts} />
   </>
 );
 const App = () => {
