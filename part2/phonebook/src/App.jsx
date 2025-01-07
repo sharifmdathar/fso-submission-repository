@@ -65,8 +65,23 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (persons.find((el) => el.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    const personExists = persons.find((p) => p.name === newName);
+    if (personExists) {
+      const confirmReplace = window.confirm(
+        `${personExists.name} is already added to phonebook, replace the old number with a new one?`
+      );
+      if (confirmReplace) {
+        const newPerson = { ...personExists, number: newNumber };
+        personServices.updatePerson(personExists.id, newPerson).then((data) => {
+          setPersons(
+            persons.map((p) =>
+              p.name === data.name ? { ...p, number: data.number } : p
+            )
+          );
+          setNewName("");
+          setNewNumber("");
+        });
+      }
     } else {
       const newPerson = {
         name: newName,
@@ -82,10 +97,10 @@ const App = () => {
   };
 
   const handleDeleteOf = (person) => {
-    console.log(person);
     if (window.confirm(`Delete record of ${person.name}?`)) {
-      personServices.deletePerson(person.id);
-      setPersons(persons.filter((p) => p.id !== person.id));
+      personServices.deletePerson(person.id).then(() => {
+        setPersons(persons.filter((p) => p.id !== person.id));
+      });
     }
   };
 
