@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Notification } from "./components/Notification";
+import { Message, Error } from "./components/Notification";
 import { Filter } from "./components/Filter";
 import { AddNewNumberForm } from "./components/AddNewNumberForm";
 import { ShowNumbers } from "./components/ShowNumbers";
@@ -10,7 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
-  const [notification, setNotification] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     personServices.getAll().then((data) => setPersons(data));
@@ -25,19 +26,31 @@ const App = () => {
       );
       if (confirmReplace) {
         const newPerson = { ...personExists, number: newNumber };
-        personServices.updatePerson(personExists.id, newPerson).then((data) => {
-          setPersons(
-            persons.map((p) =>
-              p.name === data.name ? { ...p, number: data.number } : p
-            )
-          );
-          setNewName("");
-          setNewNumber("");
-          setNotification(`Number of ${data.name} changed successfully`);
-          setTimeout(() => {
-            setNotification(null);
-          }, 5000);
-        });
+        personServices
+          .updatePerson(personExists.id, newPerson)
+          .then((data) => {
+            setPersons(
+              persons.map((p) =>
+                p.name === data.name ? { ...p, number: data.number } : p
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+            setMessage(`Number of ${data.name} changed successfully`);
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
+          })
+          .catch(() => {
+            setErrorMsg(
+              `Information of ${newPerson.name} has already been removed from the server`
+            );
+            setNewName("");
+            setNewNumber("");
+            setTimeout(() => {
+              setErrorMsg(null);
+            }, 5000);
+          });
       }
     } else {
       const newPerson = {
@@ -49,9 +62,9 @@ const App = () => {
         setPersons(persons.concat(data));
         setNewName("");
         setNewNumber("");
-        setNotification(`Added contact of ${data.name} successfully`);
+        setMessage(`Added contact of ${data.name} successfully`);
         setTimeout(() => {
-          setNotification(null);
+          setMessage(null);
         }, 5000);
       });
     }
@@ -59,16 +72,29 @@ const App = () => {
 
   const handleDeleteOf = (person) => {
     if (window.confirm(`Delete record of ${person.name}?`)) {
-      personServices.deletePerson(person.id).then(() => {
-        setPersons(persons.filter((p) => p.id !== person.id));
-      });
+      personServices
+        .deletePerson(person.id)
+        .then(() => {
+          setPersons(persons.filter((p) => p.id !== person.id));
+        })
+        .catch(() => {
+          setErrorMsg(
+            `Information of ${person.name} has already been removed from the server`
+          );
+          setNewName("");
+          setNewNumber("");
+          setTimeout(() => {
+            setErrorMsg(null);
+          }, 5000);
+        });
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification msg={notification} />
+      <Message msg={message} />
+      <Error errorMsg={errorMsg} />
       <Filter setFilter={setFilter} />
       <AddNewNumberForm
         handleSubmit={handleSubmit}
