@@ -1,63 +1,16 @@
 import { useEffect, useState } from "react";
+import { Notification } from "./components/Notification";
+import { Filter } from "./components/Filter";
+import { AddNewNumberForm } from "./components/AddNewNumberForm";
+import { ShowNumbers } from "./components/ShowNumbers";
 import personServices from "./services/persons";
-
-const Filter = ({ setFilter }) => (
-  <p>
-    filter shown with <input onChange={(e) => setFilter(e.target.value)} />
-  </p>
-);
-
-const AddNewNumberForm = ({
-  handleSubmit,
-  newName,
-  handleNameChange,
-  newNumber,
-  handleNumberChange,
-}) => (
-  <>
-    <h2>add a new</h2>
-    <form onSubmit={handleSubmit}>
-      <div>
-        name: <input value={newName} onChange={handleNameChange} />
-      </div>
-      <div>
-        number: <input value={newNumber} onChange={handleNumberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  </>
-);
-
-const Details = ({ person, handleDelete }) => (
-  <p>
-    {person.name} {person.number} <button onClick={handleDelete}>delete</button>
-  </p>
-);
-
-const ShowNumbers = ({ persons, filter, handleDeleteOf }) => (
-  <>
-    <h2>Numbers</h2>
-    {persons.map((person) => {
-      if (person.name.toLowerCase().search(filter.toLowerCase()) !== -1) {
-        return (
-          <Details
-            key={person.id}
-            person={person}
-            handleDelete={() => handleDeleteOf(person)}
-          />
-        );
-      }
-    })}
-  </>
-);
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personServices.getAll().then((data) => setPersons(data));
@@ -80,6 +33,10 @@ const App = () => {
           );
           setNewName("");
           setNewNumber("");
+          setNotification(`Number of ${data.name} changed successfully`);
+          setTimeout(() => {
+            setNotification(null);
+          }, 5000);
         });
       }
     } else {
@@ -92,6 +49,10 @@ const App = () => {
         setPersons(persons.concat(data));
         setNewName("");
         setNewNumber("");
+        setNotification(`Added contact of ${data.name} successfully`);
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
       });
     }
   };
@@ -107,6 +68,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification msg={notification} />
       <Filter setFilter={setFilter} />
       <AddNewNumberForm
         handleSubmit={handleSubmit}
