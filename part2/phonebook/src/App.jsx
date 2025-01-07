@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import personServices from "./services/persons"
+import personServices from "./services/persons";
 
 const Filter = ({ setFilter }) => (
   <p>
@@ -30,18 +30,24 @@ const AddNewNumberForm = ({
   </>
 );
 
-const Details = ({ person }) => (
+const Details = ({ person, handleDelete }) => (
   <p>
-    {person.name} {person.number}
+    {person.name} {person.number} <button onClick={handleDelete}>delete</button>
   </p>
 );
 
-const ShowNumbers = ({ persons, filter }) => (
+const ShowNumbers = ({ persons, filter, handleDeleteOf }) => (
   <>
     <h2>Numbers</h2>
     {persons.map((person) => {
       if (person.name.toLowerCase().search(filter.toLowerCase()) !== -1) {
-        return <Details key={person.id} person={person} />;
+        return (
+          <Details
+            key={person.id}
+            person={person}
+            handleDelete={() => handleDeleteOf(person)}
+          />
+        );
       }
     })}
   </>
@@ -54,30 +60,32 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    personServices.getAll().then(data => setPersons(data))
+    personServices.getAll().then((data) => setPersons(data));
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      persons.find(
-        (el) => JSON.stringify(el) === JSON.stringify({ name: newName })
-      )
-    ) {
+    if (persons.find((el) => el.name === newName)) {
       alert(`${newName} is already added to phonebook`);
     } else {
       const newPerson = {
         name: newName,
         number: newNumber,
         id: String(persons.length + 1),
-      }
-      personServices.addPerson(newPerson).then(data => {
-        setPersons(
-          persons.concat(data)
-        );
+      };
+      personServices.addPerson(newPerson).then((data) => {
+        setPersons(persons.concat(data));
         setNewName("");
         setNewNumber("");
-      })
+      });
+    }
+  };
+
+  const handleDeleteOf = (person) => {
+    console.log(person);
+    if (window.confirm(`Delete record of ${person.name}?`)) {
+      personServices.deletePerson(person.id);
+      setPersons(persons.filter((p) => p.id !== person.id));
     }
   };
 
@@ -92,7 +100,11 @@ const App = () => {
         newNumber={newNumber}
         handleNumberChange={(e) => setNewNumber(e.target.value)}
       />
-      <ShowNumbers persons={persons} filter={filter} />
+      <ShowNumbers
+        persons={persons}
+        filter={filter}
+        handleDeleteOf={handleDeleteOf}
+      />
     </div>
   );
 };
