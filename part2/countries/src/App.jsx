@@ -29,7 +29,7 @@ const App = () => {
           onChange={(e) => setFilter(e.target.value)}
         ></input>
       </p>
-      <DisplayResults countries={countries} filter={filter} />
+      <DisplayResults countries={countries} filter={filter} setFilter={setFilter}/>
     </>
   );
 };

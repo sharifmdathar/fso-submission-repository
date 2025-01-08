@@ -10,7 +10,7 @@ const CountryData = ({ country, getCountryDetails }) => {
   if (countryInfo) {
     return (
       <>
-        <h1>{countryInfo.name.common}</h1>
+        <h1>{countryInfo.flag} {countryInfo.name.common}</h1>
         <p>capital {countryInfo.capital}</p>
         <p>area {countryInfo.area}</p>
         <h4>languages:</h4>

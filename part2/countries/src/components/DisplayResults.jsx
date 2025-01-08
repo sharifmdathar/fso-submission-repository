@@ -1,7 +1,7 @@
-import countryServices from "./../services/country"
+import countryServices from "./../services/country";
 import CountryData from "./CountryData";
 
-const DisplayResults = ({ countries, filter }) => {
+const DisplayResults = ({ countries, filter, setFilter }) => {
   if (filter === "") return null;
   const isFilterPresent = (c) => c.toLowerCase().includes(filter.toLowerCase());
   const filteredCountries = countries.filter((c) => isFilterPresent(c));
@@ -14,7 +14,9 @@ const DisplayResults = ({ countries, filter }) => {
       <>
         <p> Total: {total}</p>
         {filteredCountries.map((c) => (
-          <p key={c}>{c}</p>
+          <p key={c}>
+            {c} <button onClick={() => setFilter(c)}>show</button>
+          </p>
         ))}
       </>
     );
