@@ -1,10 +1,15 @@
 import axios from "axios";
 
-const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api";
+const weatherApi = import.meta.env.VITE_WEATHER_API
+const weatherBaseUrl = `https://api.weatherapi.com/v1/current.json?key=${weatherApi}`
+const countryBaseUrl = "https://studies.cs.helsinki.fi/restcountries/api";
 
-const getAll = () => axios.get(`${baseUrl}/all`).then((res) => res.data);
+const getAll = () => axios.get(`${countryBaseUrl}/all`).then((res) => res.data);
 
 const getCountryDetails = (country) =>
-  axios.get(`${baseUrl}/name/${country}`).then((res) => res.data);
+  axios.get(`${countryBaseUrl}/name/${country}`).then((res) => res.data);
 
-export default { getAll, getCountryDetails };
+const getWeatherDetails = (location) =>
+  axios.get(`${weatherBaseUrl}&q=${location}`)
+
+export default { getAll, getCountryDetails, getWeatherDetails};

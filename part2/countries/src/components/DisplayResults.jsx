@@ -21,12 +21,7 @@ const DisplayResults = ({ countries, filter, setFilter }) => {
       </>
     );
   } else if (total === 1) {
-    return (
-      <CountryData
-        country={filteredCountries[0]}
-        getCountryDetails={countryServices.getCountryDetails}
-      />
-    );
+    return <CountryData country={filteredCountries[0]} />;
   } else {
     return <p>No results found. Please refine your query</p>;
   }
