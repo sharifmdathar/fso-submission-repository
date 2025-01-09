@@ -39,7 +39,7 @@ app.get("/info", (req, res) => {
 app.get("/api/persons/:id", (req, res) => {
   const id = req.params.id;
   const person = persons.find((p) => p.id === id);
-  if (person) res.json(person);
+  if (person) return res.json(person);
   res.status(404).end();
 });
 
@@ -51,6 +51,12 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const { name, number } = req.body;
+  if (!name || !number)
+    return res.status(400).json({ error: "The name or number is missing" });
+  if (persons.find((p) => p.name === name))
+    return res
+      .status(409)
+      .json({ error: "The name already exists in the phonebook" });
   const id = String(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
   const newPerson = { id, name, number };
   persons.push(newPerson);
