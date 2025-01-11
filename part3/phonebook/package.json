@@ -1,13 +1,15 @@
 {
-  "name": "phonebook-backend",
+  "name": "phonebook",
   "version": "1.0.0",
-  "description": "Backend for Phonebook Application",
+  "description": "A Full Stack Phonebook Application",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint ."
   },
   "dependencies": {
+    "@stylistic/eslint-plugin-js": "^2.12.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -15,6 +17,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
     "nodemon": "^3.1.9"
-  }
+  },
+  "author": "sharifmdathar"
 }
