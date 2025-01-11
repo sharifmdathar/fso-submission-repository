@@ -47,7 +47,7 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.put("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
   const name = req.body.name;
   const number = req.body.number;

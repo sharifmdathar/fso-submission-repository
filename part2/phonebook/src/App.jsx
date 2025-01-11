@@ -22,6 +22,7 @@ const App = () => {
     setNewNumber("");
     setTimeout(() => {
       setMessage(null);
+      setErrorMsg(null);
     }, 5000);
   };
 
@@ -45,11 +46,11 @@ const App = () => {
             setMessage(`Number of ${data.name} changed successfully`);
             resetForm();
           })
-          .catch(() => {
-            setErrorMsg(
-              `Information of ${newPerson.name} has already been removed from the server`
-            );
-            resetForm();
+          .catch((error) => {
+            setErrorMsg(error.response.data.error);
+            setTimeout(() => {
+              setErrorMsg(null);
+            }, 5000);
           });
       }
     } else {
@@ -79,11 +80,10 @@ const App = () => {
         .deletePerson(person.id)
         .then(() => {
           setPersons(persons.filter((p) => p.id !== person.id));
+          setMessage(`Deleted record of ${person.name} successfully`);
         })
-        .catch(() => {
-          setErrorMsg(
-            `Information of ${person.name} has already been removed from the server`
-          );
+        .catch((error) => {
+          setErrorMsg(error.response.data.error);
           resetForm();
         });
     }
