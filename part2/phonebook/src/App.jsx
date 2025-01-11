@@ -17,6 +17,14 @@ const App = () => {
     personServices.getAll().then((data) => setPersons(data));
   }, []);
 
+  const resetForm = () => {
+    setNewName("");
+    setNewNumber("");
+    setTimeout(() => {
+      setMessage(null);
+    }, 5000);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const personExists = persons.find((p) => p.name === newName);
@@ -34,39 +42,29 @@ const App = () => {
                 p.name === data.name ? { ...p, number: data.number } : p
               )
             );
-            setNewName("");
-            setNewNumber("");
             setMessage(`Number of ${data.name} changed successfully`);
-            setTimeout(() => {
-              setMessage(null);
-            }, 5000);
+            resetForm();
           })
           .catch(() => {
             setErrorMsg(
               `Information of ${newPerson.name} has already been removed from the server`
             );
-            setNewName("");
-            setNewNumber("");
-            setTimeout(() => {
-              setErrorMsg(null);
-            }, 5000);
+            resetForm();
           });
       }
     } else {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: String(persons.length + 1),
       };
-      personServices.addPerson(newPerson).then((data) => {
-        setPersons(persons.concat(data));
-        setNewName("");
-        setNewNumber("");
-        setMessage(`Added contact of ${data.name} successfully`);
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      });
+      personServices
+        .addPerson(newPerson)
+        .then((data) => {
+          setPersons(persons.concat(data));
+          setMessage(`Added contact of ${data.name} successfully`);
+          resetForm();
+        })
+        .catch((error) => setErrorMsg(error.response.data.error));
     }
   };
 
@@ -81,11 +79,7 @@ const App = () => {
           setErrorMsg(
             `Information of ${person.name} has already been removed from the server`
           );
-          setNewName("");
-          setNewNumber("");
-          setTimeout(() => {
-            setErrorMsg(null);
-          }, 5000);
+          resetForm();
         });
     }
   };
