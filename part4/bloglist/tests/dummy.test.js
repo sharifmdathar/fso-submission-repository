@@ -83,7 +83,7 @@ describe("total likes", () => {
 });
 
 describe("favourite blog", () => {
-  test("when list has only one blog, returns firs object", () => {
+  test("when list has only one blog, returns first object", () => {
     const result = listHelper.favoriteBlog(listWithOneBlog);
     assert.deepStrictEqual(result, listWithOneBlog[0]);
   });
@@ -98,5 +98,12 @@ describe("favourite blog", () => {
       likes: 12,
       __v: 0,
     });
+  });
+});
+
+describe("most blogs", () => {
+  test("when list has 5 blogs, returns author with most blogs", () => {
+    const result = listHelper.mostBlogs(listWithFiveBlogs);
+    assert.deepStrictEqual(result, { author: "Robert C. Martin", blogs: 3 });
   });
 });
