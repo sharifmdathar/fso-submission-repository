@@ -45,14 +45,8 @@ app.post("/api/persons", (req, res) => {
   const { name, number } = req.body;
   if (!name || !number)
     return res.status(400).json({ error: "The name or number is missing" });
-  if (persons.find((p) => p.name === name))
-    return res
-      .status(409)
-      .json({ error: "The name already exists in the phonebook" });
-  const id = String(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
-  const newPerson = { id, name, number };
-  persons.push(newPerson);
-  res.json(newPerson);
+  const newPerson = new Person({ name, number });
+  newPerson.save().then((result) => res.json(result));
 });
 
 const PORT = process.env.PORT || 3001;
