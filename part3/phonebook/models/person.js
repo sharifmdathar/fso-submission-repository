@@ -20,7 +20,15 @@ const personSchema = new mongoose.Schema({
     minLength: [3, "Must be at least 3, got {VALUE}"],
     required: true,
   },
-  number: String,
+  number: {
+    type: String,
+    minLength: [8, "Must be at least 8, got {VALUE}"],
+    validate: {
+      validator: (v) => /^(\d{2}|\d{3})-\d+$/.test(v),
+      message: (props) =>
+        `${props.value} is not a valid number. Expected format: 12-34567 or 123-4567 (only digits allowed after the hyphen).`,
+    },
+  },
 });
 
 personSchema.set("toJSON", {

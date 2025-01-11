@@ -64,7 +64,12 @@ const App = () => {
           setMessage(`Added contact of ${data.name} successfully`);
           resetForm();
         })
-        .catch((error) => setErrorMsg(error.response.data.error));
+        .catch((error) => {
+          setErrorMsg(error.response.data.error);
+          setTimeout(() => {
+            setErrorMsg(null);
+          }, 5000);
+        });
     }
   };
 
