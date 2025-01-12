@@ -95,6 +95,24 @@ test("deleting a single blog post resource", async () => {
   assert.strictEqual(idList.includes(savedBlogResponse.body.id), false);
 });
 
+test("updating the information of an individual blog post", async () => {
+  await api.put(`/api/blogs/invalidId`).expect(400);
+
+  const newBlog = {
+    title: "Example4",
+    author: "Mr. Example4",
+    url: "example4.com",
+    likes: 3,
+  };
+  const savedBlogResponse = await api.post("/api/blogs").send(newBlog);
+
+  const updatedBlog = { ...newBlog, likes: 4 };
+  await api
+    .put(`/api/blogs/${savedBlogResponse.body.id}`)
+    .send(updatedBlog)
+    .expect(200);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
