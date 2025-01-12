@@ -28,6 +28,7 @@ test("a new blog post can be created", async () => {
   const newBlog = {
     title: "async/await simplifies making async calls",
     author: "ES7",
+    url: "example.com",
   };
 
   await api
@@ -48,10 +49,19 @@ test("if likes property is missing, then defaults to 0", async () => {
   const newBlog = {
     title: "blog without likes",
     author: "xyz",
+    url: "example.com",
   };
 
   const savedBlog = await api.post("/api/blogs").send(newBlog);
-  assert.strictEqual(savedBlog.body.likes, 0)
+  assert.strictEqual(savedBlog.body.likes, 0);
+});
+
+test("if title or url properties are missing, then response status is 400", async () => {
+  const blogWithoutTitle = { url: "example.com" };
+  await api.post("/api/blogs").send(blogWithoutTitle).expect(400);
+
+  const blogWithoutUrl = { title: "Example" };
+  await api.post("/api/blogs").send(blogWithoutUrl).expect(400);
 });
 
 after(async () => {
