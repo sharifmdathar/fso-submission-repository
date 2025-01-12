@@ -3,7 +3,7 @@ const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 
-const Blog = require("../models/blog")
+const Blog = require("../models/blog");
 const app = require("../app");
 const api = supertest(app);
 
@@ -76,6 +76,23 @@ test("if title or url properties are missing, then response status is 400", asyn
 
   const blogWithoutUrl = { title: "Example" };
   await api.post("/api/blogs").send(blogWithoutUrl).expect(400);
+});
+
+test("deleting a single blog post resource", async () => {
+  await api.delete(`/api/blogs/invalidId`).expect(204);
+
+  const newBlog = {
+    title: "Example3",
+    author: "Mr. Example3",
+    url: "example3.com",
+    likes: 3,
+  };
+  const savedBlogResponse = await api.post("/api/blogs").send(newBlog);
+  await api.delete(`/api/blogs/${savedBlogResponse.body.id}`).expect(204);
+
+  const allBlogsResponse = await api.get("/api/blogs");
+  const idList = allBlogsResponse.body.map((b) => b.id);
+  assert.strictEqual(idList.includes(savedBlogResponse.body.id), false);
 });
 
 after(async () => {
