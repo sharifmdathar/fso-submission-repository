@@ -41,7 +41,17 @@ test("a new blog post can be created", async () => {
   assert.strictEqual(newBlogsAmount, prevBlogsAmount + 1);
 
   const titles = response.body.map((blog) => blog.title);
-  assert(titles.includes("async/await simplifies making async calls"));
+  assert.strict(titles.includes("async/await simplifies making async calls"));
+});
+
+test("if likes property is missing, then defaults to 0", async () => {
+  const newBlog = {
+    title: "blog without likes",
+    author: "xyz",
+  };
+
+  const savedBlog = await api.post("/api/blogs").send(newBlog);
+  assert.strictEqual(savedBlog.body.likes, 0)
 });
 
 after(async () => {
