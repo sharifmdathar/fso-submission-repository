@@ -1,7 +1,6 @@
-const jwt = require("jsonwebtoken");
 const blogRouter = require("express").Router();
 const Blog = require("../models/blog");
-const User = require("../models/user");
+const middleware = require("../utils/middleware");
 
 blogRouter.get("/", async (_, response) => {
   const blogs = await Blog.find({}).populate("user", {
@@ -12,19 +11,15 @@ blogRouter.get("/", async (_, response) => {
   response.json(blogs);
 });
 
-blogRouter.post("/", async (request, response, next) => {
-  const { title, url, likes } = request.body;
-  if (!title || !url) {
-    return response.status(400).end();
-  }
-  try {
-    const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
+blogRouter.post(
+  "/",
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const { title, url, likes } = request.body;
+    if (!title || !url) {
+      return response.status(400).end();
     }
-
-    const user = await User.findById(decodedToken.id);
+    const user = request.user;
 
     const blog = new Blog({
       ...request.body,
@@ -32,33 +27,37 @@ blogRouter.post("/", async (request, response, next) => {
       user: user.id,
     });
 
-    const savedBlog = await blog.save();
-    response.status(201).json(savedBlog);
+    try {
+      const savedBlog = await blog.save();
+      response.status(201).json(savedBlog);
 
-    user.blogs = user.blogs.concat(savedBlog._id);
-    await user.save();
-  } catch (error) {
-    next(error);
-  }
-});
-
-blogRouter.delete("/:id", async (request, response, next) => {
-  try {
-    const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
+      user.blogs = user.blogs.concat(savedBlog._id);
+      await user.save();
+    } catch (error) {
+      next(error);
     }
-
-    const blog = await Blog.findById(request.params.id);
-    if (blog.user.toString() === decodedToken.id.toString())
-      await Blog.findByIdAndDelete(request.params.id);
-    else response.status(403).json({ error: "token belongs to another user" });
-  } catch (error) {
-    next(error);
   }
-  response.status(204).end();
-});
+);
+
+blogRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const user = request.user;
+    try {
+      const blog = await Blog.findById(request.params.id);
+      if (!blog)
+        return response.status(404).json({ error: "blog does not exist" });
+      if (blog.user.toString() === user._id.toString())
+        await Blog.findByIdAndDelete(request.params.id);
+      else
+        response.status(403).json({ error: "this blog belongs to another user" });
+    } catch (error) {
+      next(error);
+    }
+    response.status(204).end();
+  }
+);
 
 blogRouter.put("/:id", async (request, response, next) => {
   try {
