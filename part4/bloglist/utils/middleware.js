@@ -1,5 +1,14 @@
 const logger = require("./logger");
 
+const tokenExtractor = (request, _, next) => {
+  const authorization = request.get("authorization");
+
+  if (authorization && authorization.startsWith("Bearer "))
+    request.token = authorization.replace("Bearer ", "");
+
+  next();
+};
+
 const unknownEndpoint = (_, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
@@ -28,6 +37,7 @@ const errorHandler = (error, _, response, next) => {
 };
 
 module.exports = {
+  tokenExtractor,
   unknownEndpoint,
   errorHandler,
 };
