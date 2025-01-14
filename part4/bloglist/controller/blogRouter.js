@@ -23,7 +23,7 @@ blogRouter.post("/", async (request, response, next) => {
     if (!decodedToken.id) {
       return response.status(401).json({ error: "token invalid" });
     }
-    
+
     const user = await User.findById(decodedToken.id);
 
     const blog = new Blog({
@@ -42,10 +42,21 @@ blogRouter.post("/", async (request, response, next) => {
   }
 });
 
-blogRouter.delete("/:id", async (request, response) => {
+blogRouter.delete("/:id", async (request, response, next) => {
   try {
-    await Blog.findByIdAndDelete(request.params.id);
-  } catch (error) {}
+    const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: "token invalid" });
+    }
+
+    const blog = await Blog.findById(request.params.id);
+    if (blog.user.toString() === decodedToken.id.toString())
+      await Blog.findByIdAndDelete(request.params.id);
+    else response.status(403).json({ error: "token belongs to another user" });
+  } catch (error) {
+    next(error);
+  }
   response.status(204).end();
 });
 
