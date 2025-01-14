@@ -8,8 +8,20 @@ const app = require("../app");
 const api = supertest(app);
 
 const initialBlogs = [
-  { title: "Example1", author: "Mr. Example1", url: "example1.com", likes: 1 },
-  { title: "Example2", author: "Mr. Example2", url: "example2.com", likes: 2 },
+  {
+    title: "Example1",
+    author: "Mr. Example1",
+    url: "example1.com",
+    likes: 1,
+    user: "67863072c82b0cd7bb549e7c",
+  },
+  {
+    title: "Example2",
+    author: "Mr. Example2",
+    url: "example2.com",
+    likes: 2,
+    user: "67863072c82b0cd7bb549e7c",
+  },
 ];
 
 beforeEach(async () => {
@@ -39,14 +51,22 @@ test("a new blog post can be created", async () => {
   let response = await api.get("/api/blogs");
   const prevBlogsAmount = response.body.length;
 
+  const user = await api.post("/api/login").send({
+    username: "example",
+    password: "example",
+  });
+  const token = user.body.token;
   const newBlog = {
     title: "async/await simplifies making async calls",
     author: "ES7",
     url: "example.com",
+    likes: 7,
+    userId: "67862c8eef635657f513d287",
   };
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -57,6 +77,8 @@ test("a new blog post can be created", async () => {
 
   const titles = response.body.map((blog) => blog.title);
   assert.strict(titles.includes("async/await simplifies making async calls"));
+
+  await api.post("/api/blogs").send(newBlog).expect(401);
 });
 
 test("if likes property is missing, then defaults to 0", async () => {
