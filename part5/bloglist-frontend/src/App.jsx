@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
+import Notification from "./components/Notification";
 import blogService from "./services/blogs";
 
 const App = () => {
@@ -7,6 +8,7 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  const [info, setInfo] = useState({ message: "" });
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -30,7 +32,10 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      console.log(exception);
+      setInfo({ message: exception.response.data.error, type: "error" });
+      setTimeout(() => {
+        setInfo({ message: "" });
+      }, 5000);
     }
   };
 
@@ -46,11 +51,19 @@ const App = () => {
         { title, author, url },
         { Authorization: `Bearer ${user.token}` }
       );
+      setInfo({ message: `a new blog ${title} by ${author} added` });
+      setTimeout(() => {
+        setInfo({ message: "" });
+      }, 5000);
       setTitle("");
       setAuthor("");
       setUrl("");
       setBlogs(blogs.concat(newSavedBlog));
-    } catch (e) {
+    } catch (exception) {
+      setInfo({ message: exception.response.data.error, type: "error" });
+      setTimeout(() => {
+        setInfo({ message: "" });
+      }, 5000);
       console.log(e);
     }
   };
@@ -59,6 +72,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
+        <Notification info={info} />
         <form onSubmit={handleLogin}>
           <p>
             username{" "}
@@ -83,6 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification info={info} />
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
