@@ -11,4 +11,11 @@ const login = async (credentials) => {
   return response.data;
 };
 
-export default { getAll, login };
+const createNewNote = async (blogData, headers) => {
+  const response = await axios.post(`${baseUrl}/api/blogs`, blogData, {
+    headers: headers,
+  });
+  return response.data;
+};
+
+export default { getAll, login, createNewNote };
