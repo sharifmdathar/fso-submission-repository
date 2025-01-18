@@ -34,6 +34,7 @@ const LoginForm = ({ props }) => {
             value={username}
             placeholder="Enter your username"
             onChange={({ target }) => setUsername(target.value)}
+            type="username"
           >
           </input>
           <br />
@@ -42,6 +43,7 @@ const LoginForm = ({ props }) => {
             value={password}
             placeholder="Enter your password"
             onChange={({ target }) => setPassword(target.value)}
+            type="password"
           >
           </input>
         </p>
