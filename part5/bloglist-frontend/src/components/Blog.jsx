@@ -1,7 +1,8 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, allBlogs, setBlogs }) => {
+const Blog = ({ props }) => {
+  const { blog, blogs, user, setBlogs, setInfo } = props;
   const [showDetails, setShowDetails] = useState(false);
   const blogStyle = {
     paddingTop: 10,
@@ -9,6 +10,22 @@ const Blog = ({ blog, allBlogs, setBlogs }) => {
     border: "solid",
     borderWidth: 1,
     marginBottom: 5,
+  };
+
+  const handleRemove = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        await blogService.remove(blog.id, {
+          Authorization: `Bearer ${user?.token}`,
+        });
+        setBlogs(blogs.filter((b) => b.id !== blog.id));
+      } catch (exception) {
+        setInfo({ message: exception.response.data.error, type: "error" });
+        setTimeout(() => {
+          setInfo({ message: "" });
+        }, 5000);
+      }
+    }
   };
 
   return (
@@ -22,7 +39,7 @@ const Blog = ({ blog, allBlogs, setBlogs }) => {
             likes {blog.likes}{" "}
             <button
               onClick={() => {
-                setBlogs(allBlogs.map((b) =>
+                setBlogs(blogs.map((b) =>
                   b.id === blog.id ? { ...blog, likes: blog.likes + 1 } : b
                 ));
                 blogService.incrementLikes(blog);
@@ -32,6 +49,15 @@ const Blog = ({ blog, allBlogs, setBlogs }) => {
             </button>
           </p>
           <p>{blog.user.name}</p>
+          <p>
+            {user?.username === blog.user.username && (
+              <button
+                onClick={() => handleRemove(blog)}
+              >
+                remove
+              </button>
+            )}
+          </p>
         </>
       )}
     </div>

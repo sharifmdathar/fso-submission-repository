@@ -27,4 +27,10 @@ const incrementLikes = async (blog) => {
   return response.data;
 };
 
-export default { getAll, login, createNewNote, incrementLikes };
+const remove = async (id, headers) => {
+  await axios.delete(`${baseUrl}/api/blogs/${id}`, {
+    headers: headers,
+  });
+};
+
+export default { getAll, login, createNewNote, incrementLikes, remove };
