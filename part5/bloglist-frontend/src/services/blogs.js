@@ -18,4 +18,13 @@ const createNewNote = async (blogData, headers) => {
   return response.data;
 };
 
-export default { getAll, login, createNewNote };
+const incrementLikes = async (blog) => {
+  const response = await axios.put(`${baseUrl}/api/blogs/${blog.id}`, {
+    ...blog,
+    likes: blog.likes + 1,
+    user: blog.user.id,
+  });
+  return response.data;
+};
+
+export default { getAll, login, createNewNote, incrementLikes };
