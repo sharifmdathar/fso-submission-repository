@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
 import blogService from "../services/blogs";
@@ -69,7 +70,8 @@ const NewBlogForm = ({ props }) => {
                 />
               </label>
             </div>
-            <button type="submit">Create</button><br />
+            <button type="submit">Create</button>
+            <br />
             <button type="button" onClick={() => setNewBlogVisible(false)}>
               Cancel
             </button>
@@ -78,6 +80,17 @@ const NewBlogForm = ({ props }) => {
       )}
     </>
   );
+};
+
+NewBlogForm.propTypes = {
+  props: PropTypes.object.isRequired,
+  user: PropTypes.object,
+  setUser: PropTypes.func.isRequired,
+  info: PropTypes.object.isRequired,
+  setInfo: PropTypes.func.isRequired,
+  blogs: PropTypes.array.isRequired,
+  setBlogs: PropTypes.func.isRequired,
+  setNewBlogVisible: PropTypes.func.isRequired,
 };
 
 export default NewBlogForm;
